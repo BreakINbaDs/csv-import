@@ -64,7 +64,7 @@ exports.file_upload_DB = function(req, res) {
 
 
 // Get search results function from DB
-exports.search_result = function(req, res) {
+exports.search_result_DB = function(req, res) {
   var searchName = req.param('query');
   csvModel.find({name: { "$regex": searchName, "$options": "i" }}, function (err, result) {
     if (err)

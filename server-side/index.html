@@ -30,7 +30,7 @@
 </body>
 <script>
   function sendMessageToServer (request) {
-    $.post( "http://localhost:3000/searchFile", { query: request.toString() })
+    $.post( "http://localhost:3000/search", { query: request.toString() })
       .done(function( data ) {
         $( "#results-container" ).empty();
         for (var elem in data){
