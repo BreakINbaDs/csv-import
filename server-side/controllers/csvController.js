@@ -2,7 +2,6 @@
 var csv = require("fast-csv");
 var Json2csvParser = require('json2csv').Parser;
 var fs = require("fs");
-var mongoose = require('mongoose');
 var csvModel = require('../models/csvModel');
 
 var csvStream = csv.createWriteStream({headers: true}),
@@ -29,7 +28,6 @@ exports.file_upload = function(req, res) {
          ignoreEmpty: true
      })
      .on("data", function(data){
-         data['_id'] = new mongoose.Types.ObjectId();
          csvStream.write(data);
          csvEntities.push(data);
      })
