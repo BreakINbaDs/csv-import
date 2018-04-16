@@ -18,7 +18,6 @@ exports.file_upload = function(req, res) {
         return res.status(400).send('No files were uploaded.');
 
     var csvFile = req.files.file;
-    var csvEntities = [];
     csvStream.pipe(writableStream);
     console.log('Reading...');
 
@@ -29,12 +28,34 @@ exports.file_upload = function(req, res) {
      })
      .on("data", function(data){
          csvStream.write(data);
-         csvEntities.push(data);
      })
      .on("end", function(){
        csvStream.end();
        global.io.emit('Done Reading');
-       // Clear Collection from previous upload
+       res.send('File has been successfully uploaded.');
+       });
+   });
+};
+
+// File Uploading function to DB
+exports.file_upload_DB = function(req, res) {
+    if (!req.files)
+        return res.status(400).send('No files were uploaded.');
+
+    var csvFile = req.files.file;
+    var csvEntities = [];
+    console.log('Reading...');
+
+    csv
+     .fromString(csvFile.data.toString(), {
+         headers : ["id", "name", "age", "address", "team"],
+         ignoreEmpty: true
+     })
+     .on("data", function(data){
+         csvEntities.push(data);
+     })
+     .on("end", function(){
+       global.io.emit('Done Reading');
        csvModel.insertMany(csvEntities, function(err, documents) {
             if (err) throw err;
             res.send('File has been successfully uploaded.');

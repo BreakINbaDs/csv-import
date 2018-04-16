@@ -4,6 +4,8 @@ module.exports = function(app) {
 
   // stockExchage Route
   app.route('/import').post(csvController.file_upload);
-  app.route('/search').post(csvController.search_result);
-  app.route('/searchFile').post(csvController.search_result_file);
+  app.route('/search').post(csvController.search_result_file);
+  app.route('/importDB').post(csvController.file_upload_DB);
+  app.route('/searchDB').post(csvController.search_result);
+
 };
