@@ -33,8 +33,7 @@ exports.file_upload = function(req, res) {
        csvStream.end();
        global.io.emit('Done Reading');
        res.send('File has been successfully uploaded.');
-       });
-   });
+     })
 };
 
 // File Uploading function to DB
