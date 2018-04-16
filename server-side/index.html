@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload CSV</title>
+    <!-- StyleSheets -->
+    <link rel="stylesheet" type="text/css" href="styles/index.css" />
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <!--form action="/import" method="POST" encType="multipart/form-data"-->
+    <form id="2020data">
+        <input id="uploadField" type="file" name="file" accept="*.csv" /><br/><br/>
+        <button id="uploadButton" type="submit" value="Upload File" >Upload CSV File</button>
+        <div id="uploadProgress">
+          <div id="left-percent">0%</div>
+          <div id="uploadBar"></div>
+          <div id="right-percent">100%</div>
+        </div>
+    </form>
+    <form class="" action="index.html" method="post">
+      <input type="text" id="searchField" name="configname" />
+      <input type="button" value="Submit" onclick="sendMessageToServer(document.getElementById('searchField').value)" />
+    </form>
+    <div id="results-container">
+    </div>
+</body>
+<script>
+  function sendMessageToServer (request) {
+    $.post( "http://localhost:3000/searchFile", { query: request.toString() })
+      .done(function( data ) {
+        $( "#results-container" ).empty();
+        for (var elem in data){
+          $('#results-container').append('<div class="search-result" id="result-'+elem+'">'+data[elem].name
+          +'</br></div><div style="display:none" id="extended-result-'+elem+'">Age:'+data[elem].age
+          +'</br>Address:'+data[elem].address+'</br>Team:'+data[elem].team+'</div>');
+        }
+      });
+  }
+
+  $("div").click(function(e) {
+    $('#extended-'+e.target.id).show();
+  });
+
+  $("#2020data").submit(function(e) {
+    $.ajax({
+        xhr: function()
+        {
+          var xhr = new window.XMLHttpRequest();
+          //Upload progress
+          xhr.upload.addEventListener("progress", function(evt){
+            if (evt.lengthComputable) {
+              var percentComplete = evt.loaded / evt.total;
+              //Do something with upload progress
+              var elem = document.getElementById("uploadBar");
+              elem.style.width = 30*percentComplete + '%';
+            }
+          }, false);
+          return xhr;
+        },
+        url: "http://localhost:3000/import",
+        type: "POST",
+        data: new FormData(this),
+        processData: false,
+        contentType: false,
+        success: function(data) {
+           var elem = document.getElementById("uploadBar");
+           elem.style.width = 100 + '%';
+           setTimeout(function(){ alert(data); }, 1000);
+         }
+      });
+
+      return false;
+  });
+
+  var socket = io.connect('http://localhost:3000/');
+  socket.on('news', function (data) {
+    console.log(data);
+  });
+  socket.on('Done Reading', function (){
+    var elem = document.getElementById("uploadBar");
+    elem.style.width = 70 + '%';
+  });
+</script>
+</html>
